@@ -48,7 +48,7 @@ export default class CommentsDAO {
       const commentDoc = {
         name: user.name,
         email: user.email,
-        movie_id: movieId,
+        movie_id: ObjectId(movieId),
         text: comment,
         date: date,
       }
@@ -102,6 +102,7 @@ export default class CommentsDAO {
       // Use the userEmail and commentId to delete the proper comment.
       const deleteResponse = await comments.deleteOne({
         _id: ObjectId(commentId),
+        email: userEmail,
       })
 
       return deleteResponse
