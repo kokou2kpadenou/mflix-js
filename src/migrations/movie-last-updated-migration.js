@@ -28,8 +28,8 @@ require("dotenv").config()
     // check that its type is a string
     // a projection is not required, but may help reduce the amount of data sent
     // over the wire!
-    const predicate = { somefield: { $someOperator: true } }
-    const projection = {}
+    const predicate = { lastupdated: { $exists: true, $type: 2 } }
+    const projection = { lastupdated: 1 }
     const cursor = await mflix
       .collection("movies")
       .find(predicate, projection)
@@ -45,11 +45,14 @@ require("dotenv").config()
     console.log(
       "\x1b[32m",
       `Found ${moviesToMigrate.length} documents to update`,
+      "\x1b[0m",
     )
     // TODO: Complete the BulkWrite statement below
-    const { modifiedCount } = await "some bulk operation"
+    const { modifiedCount } = await mflix
+      .collection("movies")
+      .bulkWrite(moviesToMigrate)
 
-    console.log("\x1b[32m", `${modifiedCount} documents updated`)
+    console.log("\x1b[32m", `${modifiedCount} documents updated`, "\x1b[0m")
     client.close()
     process.exit(0)
   } catch (e) {
@@ -57,9 +60,9 @@ require("dotenv").config()
       e instanceof MongoError &&
       e.message.slice(0, "Invalid Operation".length) === "Invalid Operation"
     ) {
-      console.log("\x1b[32m", "No documents to update")
+      console.log("\x1b[32m", "No documents to update", "\x1b[0m")
     } else {
-      console.error("\x1b[31m", `Error during migration, ${e}`)
+      console.error("\x1b[31m", `Error during migration, ${e}`, "\x1b[0m")
     }
     process.exit(1)
   }
